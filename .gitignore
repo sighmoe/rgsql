@@ -8,3 +8,8 @@ __pycache__/
 SharpQL/bin
 SharpQL/obj
 SharpQL/.idea
+
+
+SharpQL.Tests/bin
+SharpQL.Tests/obj
+SharpQL.Tests/.idea
