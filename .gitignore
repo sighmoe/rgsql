@@ -4,3 +4,7 @@ server_error.log
 __pycache__/
 *.pyc
 *.pyo
+
+SharpQL/bin
+SharpQL/obj
+SharpQL/.idea
