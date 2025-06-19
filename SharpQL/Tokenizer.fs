@@ -1,16 +1,19 @@
 module Tokenizer
 
 open System.Text
+open Microsoft.FSharp.Core
 
 let seperators = " ,"
 type Token =
     | Identifier of string
+    | Integer of int 
     | Select
     | StatementEnd
 
 let emitToken = function
     | "select" -> Select
     | ";" -> StatementEnd
+    | other when System.Int32.TryParse other |> fst -> Integer (int other)
     | other -> Identifier other
 type Tokenizer() =
     let buffer = StringBuilder()
