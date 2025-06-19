@@ -26,8 +26,6 @@ SharpQL is an F# implementation of a SQL database server for the rgSQL test suit
 
 **SharpQL.fsproj**: .NET 9.0 F# console application targeting executable output
 
-**Program.fs**: Main entry point - currently contains placeholder "Hello from F#"
-
 ### rgSQL Test Framework Integration
 
 The project is part of the rgSQL ecosystem located in `/Users/Kevin/Dev/rgsql/`:
@@ -76,3 +74,8 @@ server_command = dotnet run --project SharpQL
 - Focus on implementing a TCP server that can parse and execute SQL statements
 - Test early and often using the rgSQL test suite
 - Server logs are captured in `../server_output.log` and `../server_error.log`
+
+## F# Style Guidelines
+- All F# code uses the task { } computation expression to handle asynchronous operations.
+- All F# code should be written in a functional style, using immutability and pure functions where possible.
+- All F# code should the new syntax when referring to arrays, lists, and sequences: use myArray[0] instead of myArray.[0].

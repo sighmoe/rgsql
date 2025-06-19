@@ -3,9 +3,11 @@ module TokenizerTests
 open System.Text
 open NUnit.Framework
 open Tokenizer
+open Debug
 
 [<Test>]
 let testTokenizerSelectToken () =
+    Debug.log "Running testTokenizerSelectToken"
     let tokenizer = Tokenizer()
     let input = "SELECT 1;"
     let chunk = Encoding.UTF8.GetBytes(input)

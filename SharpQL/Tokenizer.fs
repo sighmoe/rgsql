@@ -21,7 +21,7 @@ type Tokenizer() =
         let tokens = ResizeArray<Token>()
         
         for i in 0..input.Length-1 do
-            let ch = input.Chars i
+            let ch = input[i]
             
             if seperators.Contains(ch) then
                 tokens.Add(buffer.ToString().ToLower() |> emitToken)
