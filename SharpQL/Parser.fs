@@ -13,8 +13,24 @@ type Parser() =
     
     member this.ProcessStatement() =
         if this.HasCompleteStatement() then
-            let tokens = tokenBuffer.ToArray()
+            let statement = this.EmitStatement()
             tokenBuffer.Clear()
-            Some tokens
+            Some(statement)
         else
             None
+            
+    member this.EmitStatement() =
+        let statementBuffer = ResizeArray<Token>()
+        let tokenList = List.ofSeq tokenBuffer
+        let mutable atStatementEnd = false
+        
+        let mutable cursor = tokenList
+        while not atStatementEnd do
+            if cursor.Head = StatementEnd then
+                atStatementEnd <- true
+            statementBuffer.Add(cursor.Head)
+            cursor <- cursor.Tail
+            
+        tokenBuffer.Clear() |> ignore
+        tokenBuffer.AddRange(tokenList)
+        statementBuffer.ToArray() 

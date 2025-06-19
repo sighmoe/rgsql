@@ -27,10 +27,10 @@ let testParserCompleteStatement () =
     Assert.That(parser.HasCompleteStatement(), Is.EqualTo(true), "Should have complete statement with StatementEnd")
     
     match parser.ProcessStatement() with
-    | Some completedTokens ->
-        Assert.That(completedTokens.Length, Is.EqualTo(2), "Should return all tokens in completed statement")
-        Assert.That(completedTokens.[0], Is.EqualTo(Select), "First token should be Select")
-        Assert.That(completedTokens.[1], Is.EqualTo(StatementEnd), "Second token should be StatementEnd")
+    | Some statement ->
+        Assert.That(statement.Length, Is.EqualTo(2), "Should return all tokens in completed statement")
+        Assert.That(statement.[0], Is.EqualTo(Select), "First token should be Select")
+        Assert.That(statement.[1], Is.EqualTo(StatementEnd), "Second token should be StatementEnd")
     | None ->
         Assert.Fail("Should return completed statement")
 

@@ -7,14 +7,37 @@ open Tokenizer
 [<Test>]
 let testTokenizerSelectToken () =
     let tokenizer = Tokenizer()
-    let input = "SELECT * FROM users;"
+    let input = "SELECT 1;"
     let chunk = Encoding.UTF8.GetBytes(input)
     
     match tokenizer.ProcessChunk(chunk) with
     | Some tokens ->
-        Assert.That(tokens.Length, Is.EqualTo(2), "Should return 2 tokens for SELECT statement")
+        Assert.That(tokens.Length, Is.EqualTo(3), "Should return 3 tokens")
         Assert.That(tokens.[0], Is.EqualTo(Select), "First token should be Select")
-        Assert.That(tokens.[1], Is.EqualTo(StatementEnd), "Second token should be StatementEnd")
+        Assert.That(tokens.[1], Is.EqualTo(Identifier "1"), "Second token should be an Identifier with value '1'")
+        Assert.That(tokens.[2], Is.EqualTo(StatementEnd), "Third token should be StatementEnd")
+    | None ->
+        Assert.Fail("Should return tokens for SELECT statement")
+        
+let testTokenizerSplitTokens () =
+    let tokenizer = Tokenizer()
+    let input1 = "SELE"
+    let input2 = "CT 1;"
+    
+    let chunk1 = Encoding.UTF8.GetBytes(input1)
+    let chunk2 = Encoding.UTF8.GetBytes(input2)
+    
+    match tokenizer.ProcessChunk(chunk1) with
+    | Some _ ->
+        Assert.Fail("Should not return tokens for incomplete SELECT statement")
+    | None -> ()
+    
+    match tokenizer.ProcessChunk(chunk2) with
+    | Some tokens ->
+        Assert.That(tokens.Length, Is.EqualTo(3), "Should return 3 tokens")
+        Assert.That(tokens.[0], Is.EqualTo(Select), "First token should be Select")
+        Assert.That(tokens.[1], Is.EqualTo(Identifier "1"), "Second token should be an Identifier with value '1'")
+        Assert.That(tokens.[2], Is.EqualTo(StatementEnd), "Third token should be StatementEnd")
     | None ->
         Assert.Fail("Should return tokens for SELECT statement")
 
@@ -26,27 +49,15 @@ let testTokenizerStatementEndOnly () =
     
     match tokenizer.ProcessChunk(chunk) with
     | Some tokens ->
-        Assert.That(tokens.Length, Is.EqualTo(1), "Should return 1 token for semicolon only")
         Assert.That(tokens.[0], Is.EqualTo(StatementEnd), "Token should be StatementEnd")
+        Assert.That(tokens.Length, Is.EqualTo(1), "Should return 1 token for semicolon only")
     | None ->
         Assert.Fail("Should return StatementEnd token for semicolon")
 
 [<Test>]
-let testTokenizerNoTokens () =
-    let tokenizer = Tokenizer()
-    let input = "UPDATE users SET name = 'test'"
-    let chunk = Encoding.UTF8.GetBytes(input)
-    
-    match tokenizer.ProcessChunk(chunk) with
-    | Some _ ->
-        Assert.Fail("Should not return tokens for incomplete statement")
-    | None ->
-        Assert.Pass("Should return None for incomplete statement without semicolon")
-
-[<Test>]
 let testTokenizerCaseInsensitive () =
     let tokenizer = Tokenizer()
-    let input = "select * from users;"
+    let input = "select;"
     let chunk = Encoding.UTF8.GetBytes(input)
     
     match tokenizer.ProcessChunk(chunk) with

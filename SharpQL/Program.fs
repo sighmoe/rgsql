@@ -20,14 +20,12 @@ let handleConnection (client: TcpClient) =
         
         printfn "Read %d bytes" bytesRead
             
-        let result = tokenizer.ProcessChunk(chunk)
-            
-        match result with
+        match tokenizer.ProcessChunk(chunk) with
         | Some(tokens) ->
             parser.AddTokens(tokens)
             match parser.ProcessStatement() with
-            | Some(completedTokens) ->
-                printfn "Parsed complete statement with %d tokens" completedTokens.Length
+            | Some(statement) ->
+                printfn "Emit complete statement %A with %d tokens" statement statement.Length
                 use writer = new BinaryWriter(stream, Encoding.UTF8, true)
                 writer.Write("ECHO")
                 writer.Write(byte 0)

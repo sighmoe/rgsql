@@ -12,6 +12,7 @@ SharpQL is an F# implementation of a SQL database server for the rgSQL test suit
 - `dotnet build` - Build the F# project
 - `dotnet run` - Run the application
 - `dotnet clean` - Clean build artifacts
+- `dotnet test` - Run unit test project
 
 ### Testing
 - `../run-tests` - Run the complete rgSQL test suite (from parent directory)
