@@ -5,6 +5,7 @@ open System.Text
 open System.Threading
 open System.Threading.Tasks
 
+open Interpreter
 open Tokenizer
 open Parser
 
@@ -12,6 +13,7 @@ let handleConnection (client: TcpClient) = task {
     Debug.log $"Client connected from {client.Client.RemoteEndPoint}"
     
     use stream = client.GetStream()
+    let interpreter = Interpreter()
     let tokenizer = Tokenizer()
     let parser = Parser()
     let buffer = Array.zeroCreate<byte> 1024
@@ -22,17 +24,40 @@ let handleConnection (client: TcpClient) = task {
         
         Debug.log $"Read {bytesRead} bytes"
             
-        match tokenizer.ProcessChunk(chunk) with
-        | Some(tokens) ->
-            parser.AddTokens(tokens)
-            match parser.ProcessStatement() with
-            | Some(statement) ->
-                Debug.log $"Emit complete statement {statement} with {statement.Length} tokens"
-                use writer = new BinaryWriter(stream, Encoding.UTF8, true)
-                writer.Write("ECHO")
-                writer.Write(byte 0)
+        try
+            match tokenizer.ProcessChunk(chunk) with
+            | Some(tokens) ->
+                parser.AddTokens(tokens)
+                try
+                    match parser.ProcessStatement() with
+                    | Some(statement) ->
+                        Debug.log $"Parsed statement: {statement}"
+                        let result = interpreter.Eval(statement)
+                        let jsonResponse = interpreter.ResultToJson(result)
+                        Debug.log $"JSON response: {jsonResponse}"
+                        let responseBytes = Encoding.UTF8.GetBytes(jsonResponse)
+                        stream.Write(responseBytes, 0, responseBytes.Length)
+                        stream.WriteByte(0uy)
+                    | None -> ()
+                with
+                | ex ->
+                    Debug.log $"Parsing error: {ex.Message}"
+                    parser.ClearState() // Clear parser state after error
+                    let errorResult = Error("parsing_error")
+                    let jsonResponse = interpreter.ResultToJson(errorResult)
+                    let responseBytes = Encoding.UTF8.GetBytes(jsonResponse)
+                    stream.Write(responseBytes, 0, responseBytes.Length)
+                    stream.WriteByte(0uy)
             | None -> ()
-        | None -> ()
+        with
+        | ex ->
+            Debug.log $"Tokenizer error: {ex.Message}"
+            parser.ClearState() // Clear parser state after tokenizer error
+            let errorResult = Error("parsing_error")
+            let jsonResponse = interpreter.ResultToJson(errorResult)
+            let responseBytes = Encoding.UTF8.GetBytes(jsonResponse)
+            stream.Write(responseBytes, 0, responseBytes.Length)
+            stream.WriteByte(0uy)
 } 
 
 let startServer port =
