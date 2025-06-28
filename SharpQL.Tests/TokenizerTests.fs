@@ -16,7 +16,7 @@ let testTokenizerSelectToken () =
     | Some tokens ->
         Assert.That(tokens.Length, Is.EqualTo(3), "Should return 3 tokens")
         Assert.That(tokens.[0], Is.EqualTo(Select), "First token should be Select")
-        Assert.That(tokens.[1], Is.EqualTo(Identifier "1"), "Second token should be an Identifier with value '1'")
+        Assert.That(tokens.[1], Is.EqualTo(Integer 1), "Second token should be an Integer with value 1")
         Assert.That(tokens.[2], Is.EqualTo(StatementEnd), "Third token should be StatementEnd")
     | None ->
         Assert.Fail("Should return tokens for SELECT statement")

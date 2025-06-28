@@ -50,3 +50,7 @@ let testParserMultipleStatements () =
         Assert.That(parser.HasCompleteStatement(), Is.EqualTo(false), "Buffer should be cleared after processing")
     | None ->
         Assert.Fail("Should return completed statement")
+
+// Dummy main to suppress FS0988 warning
+[<EntryPoint>]
+let main _ = 0
